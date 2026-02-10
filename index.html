@@ -27,7 +27,163 @@
     </style>
   </head>
   <body class="p-4">
-    <!-- ... struktur HTML tetap sama ... -->
+ <main
+      class="w-full max-w-md glass p-6 relative min-h-[600px] flex flex-col"
+    >
+      <header class="text-center mb-6">
+        <div
+          class="inline-block p-3 rounded-full bg-white/30 mb-2 backdrop-blur-sm"
+        >
+          <span class="text-4xl">👻♻️</span>
+        </div>
+        <h1 class="text-3xl font-bold text-gray-800 drop-shadow-sm">CASPER GO GREEN</h1>
+        <p class="text-emerald-800 font-semibold text-sm opacity-80">
+          Asisten Kebersihan SMK Pertiwi
+        </p>
+        <div
+          class="absolute top-6 right-6 bg-white/40 px-3 py-1 rounded-full border border-white/50 backdrop-blur-md"
+        >
+          <span class="text-xs font-bold text-emerald-900"
+            >XP: <span id="user-xp">0</span></span
+          >
+        </div>
+      </header>
+      <div class="flex p-1 bg-black/5 rounded-2xl mb-6 backdrop-blur-sm">
+        <button
+          onclick="_st('scan')"
+          id="tab-scan"
+          class="flex-1 py-2 rounded-xl text-sm font-bold transition-all bg-white shadow-sm text-emerald-700"
+        >
+          🔍 Cek Sampah
+        </button>
+        <button
+          onclick="_st('game')"
+          id="tab-game"
+          class="flex-1 py-2 rounded-xl text-sm font-bold text-gray-600 hover:text-emerald-700"
+        >
+          🎮 Mini Game
+        </button>
+      </div>
+      <div id="view-scan" class="flex-1 flex flex-col gap-4 fade-in">
+        <div>
+          <label
+            class="block text-xs font-bold text-gray-600 uppercase mb-2 pl-2"
+            >Lagi dimana?</label
+          >
+          <div class="relative">
+            <select
+              id="locationInput"
+              class="w-full p-4 glass-input rounded-xl appearance-none font-bold text-gray-700 outline-none focus:ring-2 focus:ring-emerald-400 cursor-pointer"
+            >
+              <option value="Depan Lab 1">📍 Depan Lab 1 (Komputer)</option>
+              <option value="Depan COE TKJ">📍 Depan COE (TKJ)</option>
+              <option value="Depan SPW">📍 Depan SPW</option>
+              <option value="Dalam Kelas">🏫 Di Dalam Kelas</option>
+              <option value="Kantin">🍜 Kantin Sekolah</option>
+              <option value="Gerbang Sekolah">🚪 Gerbang Sekolah</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label
+            class="block text-xs font-bold text-gray-600 uppercase mb-2 pl-2"
+            >Sampah apa?</label
+          ><input
+            type="text"
+            id="trashInput"
+            placeholder="Contoh: Plastik cilok, botol..."
+            class="w-full p-4 glass-input rounded-xl font-bold text-gray-700 outline-none focus:ring-2 focus:ring-emerald-400 placeholder-gray-500"
+          />
+        </div>
+        <button
+          onclick="_ac()"
+          id="btn-ask"
+          class="w-full glass-btn text-white font-bold py-4 rounded-xl transition-transform active:scale-95 flex justify-center items-center gap-2 mt-2"
+        >
+          <span>Tanya Casper</span>
+          <div id="loader" class="loader hidden"></div>
+        </button>
+        <div
+          id="ai-result"
+          class="hidden mt-4 bg-white/60 backdrop-blur-md border border-white/50 rounded-2xl p-5 relative overflow-hidden"
+        >
+          <div class="flex items-start gap-4">
+            <div id="res-emoji" class="text-5xl bg-white/50 p-2 rounded-2xl">
+              🗑️
+            </div>
+            <div>
+              <span
+                id="res-type"
+                class="inline-block text-[10px] font-bold text-white px-2 py-0.5 rounded-md mb-1 bg-gray-400"
+                >ANALYZING</span
+              >
+              <h3
+                id="res-direction"
+                class="font-bold text-gray-800 text-md leading-tight"
+              >
+                ...
+              </h3>
+            </div>
+          </div>
+          <div class="mt-3 pt-3 border-t border-gray-200/50">
+            <p class="text-xs font-bold text-emerald-800 mb-1">💡 FUN FACT:</p>
+            <p id="res-fact" class="text-xs text-gray-600 italic">...</p>
+          </div>
+        </div>
+      </div>
+      <div
+        id="view-game"
+        class="flex-1 hidden flex-col justify-center text-center fade-in"
+      >
+        <div id="game-start">
+          <div class="text-6xl mb-4 animate-bounce">🌍</div>
+          <h2 class="text-2xl font-bold text-gray-800">Quiz Pemilah!</h2>
+          <p class="text-gray-600 text-sm mt-2 mb-8">
+            Buktikan kamu peserta didik yang peduli lingkungan.
+          </p>
+          <button
+            onclick="_sg()"
+            class="w-full glass-btn text-white font-bold py-4 rounded-xl shadow-lg hover:brightness-110 transition"
+          >
+            Mulai Main (+XP)
+          </button>
+        </div>
+        <div id="game-play" class="hidden text-left">
+          <div class="flex justify-between items-center mb-6">
+            <span class="text-xs font-bold text-gray-500">PERTANYAAN</span
+            ><span
+              id="q-counter"
+              class="text-xs font-bold text-emerald-600 bg-white/50 px-2 py-1 rounded-md"
+              >1/5</span
+            >
+          </div>
+          <h3
+            id="q-text"
+            class="text-lg font-bold text-gray-800 mb-6 leading-relaxed"
+          >
+            Soal...
+          </h3>
+          <div id="q-options" class="space-y-3"></div>
+          <div
+            id="q-feedback"
+            class="hidden mt-4 p-3 rounded-xl text-center font-bold text-sm bg-white/40 backdrop-blur-md"
+          ></div>
+        </div>
+        <div id="game-end" class="hidden">
+          <div class="text-6xl mb-2">🏆</div>
+          <h2 class="text-4xl font-bold text-emerald-800 mb-1" id="final-score">
+            0
+          </h2>
+          <p class="text-gray-600 font-bold text-sm mb-8">Poin Didapat</p>
+          <button
+            onclick="_rg()"
+            class="w-full glass-btn text-white font-bold py-4 rounded-xl"
+          >
+            Main Lagi
+          </button>
+        </div>
+      </div>
+    </main>    <!-- ... struktur HTML tetap sama ... -->
     <script>
       /* CASPER CORE V1.0 - SMK PERTIWI */
       
