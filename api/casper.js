@@ -1,4 +1,4 @@
-// api/casper.js - ES Modules Version
+// api/casper.js - ES Modules Version for Node.js 24
 export default async function handler(req, res) {
   // Only allow POST requests
   if (req.method !== "POST") {
@@ -12,10 +12,21 @@ export default async function handler(req, res) {
     if (!key) {
       console.error("GEMINI_API_KEY not found in environment variables");
       return res.status(500).json({ 
-        error: "Server configuration error" 
+        error: "Server configuration error",
+        details: "Please set GEMINI_API_KEY in Vercel environment variables"
       });
     }
 
+    // Validate request body
+    if (!req.body || !req.body.contents) {
+      return res.status(400).json({ 
+        error: "Bad request",
+        details: "Request body must contain 'contents' array"
+      });
+    }
+
+    console.log("Forwarding request to Gemini API...");
+    
     // Forward request to Google Gemini API
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${key}`,
@@ -34,11 +45,20 @@ export default async function handler(req, res) {
     
     // If Gemini API returns an error
     if (!response.ok) {
-      console.error("Gemini API error:", data);
+      console.error("Gemini API error:", {
+        status: response.status,
+        statusText: response.statusText,
+        error: data
+      });
+      
       return res.status(response.status).json({ 
-        error: data.error?.message || "Gemini API error" 
+        error: "Gemini API error",
+        message: data.error?.message || response.statusText,
+        details: data
       });
     }
+    
+    console.log("Successfully received response from Gemini API");
     
     // Return successful response
     return res.status(200).json(data);
@@ -47,7 +67,8 @@ export default async function handler(req, res) {
     console.error("Server error:", error);
     return res.status(500).json({ 
       error: "Internal server error",
-      message: error.message 
+      message: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 }
