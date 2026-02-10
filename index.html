@@ -12,7 +12,6 @@
     <style>
       body {
         font-family: "Quicksand", sans-serif;
-        /* PERBAIKAN: Ganti dengan URL gambar online */
         background-image: url("https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80");
         background-size: cover;
         background-position: center;
@@ -23,11 +22,56 @@
         justify-content: center;
         overflow-x: hidden;
       }
-      /* ... sisa style tetap sama ... */
+      .glass {
+        background: rgba(255, 255, 255, 0.25);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+      }
+      .glass-input {
+        background: rgba(255, 255, 255, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(4px);
+      }
+      .glass-btn {
+        background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+      .fade-in {
+        animation: fadeIn 0.5s ease-out forwards;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .loader {
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-top: 3px solid white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
     </style>
   </head>
   <body class="p-4">
- <main
+    <main
       class="w-full max-w-md glass p-6 relative min-h-[600px] flex flex-col"
     >
       <header class="text-center mb-6">
@@ -183,57 +227,70 @@
           </button>
         </div>
       </div>
-    </main>    <!-- ... struktur HTML tetap sama ... -->
+    </main>
     <script>
       /* CASPER CORE V1.0 - SMK PERTIWI */
       
+      // Initialize XP
       let _xp = parseInt(localStorage.getItem("CASPER_XP")) || 0;
       document.getElementById("user-xp").innerText = _xp;
       
+      // Switch Tabs
       function _st(t) {
-        const v = {
+        const views = {
             scan: document.getElementById("view-scan"),
             game: document.getElementById("view-game"),
           },
-          b = {
+          buttons = {
             scan: document.getElementById("tab-scan"),
             game: document.getElementById("tab-game"),
           };
-        Object.values(v).forEach((e) => e.classList.add("hidden"));
-        v[t].classList.remove("hidden");
-        Object.values(b).forEach(
-          (e) =>
-            (e.className =
-              "flex-1 py-2 rounded-xl text-sm font-bold text-gray-600 hover:text-emerald-700"),
-        );
-        b[t].className =
-          "flex-1 py-2 rounded-xl text-sm font-bold transition-all bg-white shadow-sm text-emerald-700";
+        
+        // Hide all views
+        Object.values(views).forEach((view) => view.classList.add("hidden"));
+        
+        // Show selected view
+        views[t].classList.remove("hidden");
+        
+        // Reset all buttons
+        Object.values(buttons).forEach((btn) => {
+          btn.className = "flex-1 py-2 rounded-xl text-sm font-bold text-gray-600 hover:text-emerald-700";
+        });
+        
+        // Highlight selected button
+        buttons[t].className = "flex-1 py-2 rounded-xl text-sm font-bold transition-all bg-white shadow-sm text-emerald-700";
       }
       
+      // Ask Casper AI
       async function _ac() {
-        const t = document.getElementById("trashInput").value,
-              l = document.getElementById("locationInput").value;
+        const trash = document.getElementById("trashInput").value.trim();
+        const location = document.getElementById("locationInput").value;
         
-        if (!t) return alert("Isi dulu nama sampahnya ya!");
+        if (!trash) {
+          alert("Isi dulu nama sampahnya ya!");
+          return;
+        }
         
-        const b = document.getElementById("btn-ask"),
-              ld = document.getElementById("loader"),
-              rb = document.getElementById("ai-result");
+        const button = document.getElementById("btn-ask");
+        const loader = document.getElementById("loader");
+        const resultBox = document.getElementById("ai-result");
         
-        b.disabled = true;
-        b.classList.add("opacity-75");
-        ld.classList.remove("hidden");
-        rb.classList.add("hidden");
+        // Disable button and show loader
+        button.disabled = true;
+        button.classList.add("opacity-75");
+        loader.classList.remove("hidden");
+        resultBox.classList.add("hidden");
         
-        const p = `Role: You are CASPER, a friendly AI robot at SMK Pertiwi Kuningan. User Location: ${l}. Trash Item: ${t}. SCHOOL RULES: 1. Depan Lab 1: Has 2 Bins (Organic & Anorganic). 2. Depan COE (TKJ): Has 1 Bin (General). Use it but advise separation if possible. 3. Dalam Kelas: Small bin for dry waste. 4. Depan SPW & Gerbang: General bins available. 5. Kantin: Bins available at stalls. TASK: 1. Categorize trash (Organic/Anorganic/B3). 2. Give specific direction based on User Location rules above. 3. Provide a short Fun Fact. OUTPUT JSON ONLY: { "type": "ORGANIK" or "ANORGANIK" or "B3", "color": "green" or "yellow" or "red", "emoji": "trash emoji", "direction": "Short Indonesian instruction on which bin to use at ${l}.", "fact": "Short fun fact in Indonesian." }`;
+        // Prepare prompt
+        const prompt = `Role: You are CASPER, a friendly AI robot at SMK Pertiwi Kuningan. User Location: ${location}. Trash Item: ${trash}. SCHOOL RULES: 1. Depan Lab 1: Has 2 Bins (Organic & Anorganic). 2. Depan COE (TKJ): Has 1 Bin (General). Use it but advise separation if possible. 3. Dalam Kelas: Small bin for dry waste. 4. Depan SPW & Gerbang: General bins available. 5. Kantin: Bins available at stalls. TASK: 1. Categorize trash (Organic/Anorganic/B3). 2. Give specific direction based on User Location rules above. 3. Provide a short Fun Fact. OUTPUT JSON ONLY: { "type": "ORGANIK" or "ANORGANIK" or "B3", "color": "green" or "yellow" or "red", "emoji": "trash emoji", "direction": "Short Indonesian instruction on which bin to use at ${location}.", "fact": "Short fun fact in Indonesian." }`;
         
         try {
-          // PERBAIKAN: Gunakan API route yang sudah dibuat
+          // Call our API route
           const response = await fetch("/api/casper", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              contents: [{ parts: [{ text: p }] }]
+              contents: [{ parts: [{ text: prompt }] }]
             }),
           });
           
@@ -243,39 +300,182 @@
           
           const data = await response.json();
           
+          // Check for API errors
           if (data.error) {
-            throw new Error(data.error);
+            throw new Error(data.error.message || "API Error");
           }
           
-          const txt = data.candidates?.[0]?.content?.parts?.[0]?.text
-            ?.replace(/```json|```/g, "")
-            .trim();
-            
-          if (!txt) throw new Error("No response from AI");
+          // Extract text from response
+          const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text;
           
-          const j = JSON.parse(txt);
-          document.getElementById("res-emoji").innerText = j.emoji;
-          document.getElementById("res-direction").innerText = j.direction;
-          document.getElementById("res-fact").innerText = j.fact;
+          if (!responseText) {
+            throw new Error("No response from AI");
+          }
           
-          const tb = document.getElementById("res-type");
-          tb.innerText = j.type;
-          tb.className = `inline-block text-[10px] font-bold text-white px-2 py-0.5 rounded-md mb-1 ${j.color === "green" ? "bg-green-500" : j.color === "yellow" ? "bg-yellow-500" : "bg-red-500"}`;
+          // Clean and parse JSON
+          const cleanText = responseText.replace(/```json|```/g, "").trim();
+          const result = JSON.parse(cleanText);
           
+          // Update UI with results
+          document.getElementById("res-emoji").innerText = result.emoji || "🗑️";
+          document.getElementById("res-direction").innerText = result.direction || "Tidak ada instruksi";
+          document.getElementById("res-fact").innerText = result.fact || "Tidak ada fakta";
+          
+          const typeBadge = document.getElementById("res-type");
+          typeBadge.innerText = result.type || "TIDAK DIKETAHUI";
+          
+          // Set color based on type
+          let badgeColor = "bg-gray-500";
+          if (result.color === "green") badgeColor = "bg-green-500";
+          else if (result.color === "yellow") badgeColor = "bg-yellow-500";
+          else if (result.color === "red") badgeColor = "bg-red-500";
+          
+          typeBadge.className = `inline-block text-[10px] font-bold text-white px-2 py-0.5 rounded-md mb-1 ${badgeColor}`;
+          
+          // Add XP and show result
           _axp(15);
-          rb.classList.remove("hidden");
-          rb.classList.add("fade-in");
-        } catch (e) {
-          console.error("Error:", e);
-          alert("Gagal: " + e.message);
+          resultBox.classList.remove("hidden");
+          resultBox.classList.add("fade-in");
+          
+        } catch (error) {
+          console.error("Error:", error);
+          alert("Gagal memproses permintaan: " + error.message);
         } finally {
-          b.disabled = false;
-          b.classList.remove("opacity-75");
-          ld.classList.add("hidden");
+          // Re-enable button and hide loader
+          button.disabled = false;
+          button.classList.remove("opacity-75");
+          loader.classList.add("hidden");
         }
       }
       
-      // ... sisa fungsi game tetap sama ...
+      // Game Questions
+      const _qs = [
+        {
+          q: "Bekas bungkus cilok plastik masuk mana?",
+          o: ["Organik", "Anorganik", "B3"],
+          a: 1,
+        },
+        {
+          q: "Daun kering depan Lab RPL?",
+          o: ["Organik", "Anorganik", "Bakar"],
+          a: 0,
+        },
+        {
+          q: "Baterai bekas jam dinding?",
+          o: ["Organik", "Anorganik", "B3 (Limbah B3)"],
+          a: 2,
+        },
+        {
+          q: "Kertas ulangan harian yg gakepake?",
+          o: ["Organik", "Anorganik", "B3"],
+          a: 1,
+        },
+        {
+          q: "Sisa nasi uduk kantin?",
+          o: ["Organik", "Anorganik", "B3"],
+          a: 0,
+        },
+      ];
+      
+      let _qi = 0; // Current question index
+      let _sc = 0; // Current score
+      
+      // Start Game
+      function _sg() {
+        _qi = 0;
+        _sc = 0;
+        document.getElementById("game-start").classList.add("hidden");
+        document.getElementById("game-play").classList.remove("hidden");
+        document.getElementById("game-end").classList.add("hidden");
+        _lq();
+      }
+      
+      // Load Question
+      function _lq() {
+        const question = _qs[_qi];
+        
+        // Update counter
+        document.getElementById("q-counter").innerText = `${_qi + 1}/${_qs.length}`;
+        
+        // Set question text
+        document.getElementById("q-text").innerText = question.q;
+        
+        // Clear and create options
+        const optionsContainer = document.getElementById("q-options");
+        optionsContainer.innerHTML = "";
+        
+        // Hide feedback
+        document.getElementById("q-feedback").classList.add("hidden");
+        
+        // Create option buttons
+        question.o.forEach((option, index) => {
+          const button = document.createElement("button");
+          button.className = "w-full text-left p-4 rounded-xl bg-white/60 hover:bg-white/80 border border-white/40 font-bold text-gray-700 transition-all";
+          button.innerText = option;
+          button.onclick = () => _ca(index, question.a, button);
+          optionsContainer.appendChild(button);
+        });
+      }
+      
+      // Check Answer
+      function _ca(selectedIndex, correctIndex, button) {
+        const feedback = document.getElementById("q-feedback");
+        
+        // Disable all buttons
+        document.querySelectorAll("#q-options button").forEach((btn) => {
+          btn.disabled = true;
+        });
+        
+        feedback.classList.remove("hidden");
+        
+        if (selectedIndex === correctIndex) {
+          // Correct answer
+          _sc += 20;
+          button.style.background = "#d1fae5";
+          feedback.innerText = "✅ Benar!";
+          feedback.style.color = "#065f46";
+          feedback.style.background = "#d1fae5";
+        } else {
+          // Wrong answer
+          button.style.background = "#fee2e2";
+          feedback.innerText = "❌ Salah!";
+          feedback.style.color = "#991b1b";
+          feedback.style.background = "#fee2e2";
+        }
+        
+        // Move to next question after delay
+        setTimeout(() => {
+          _qi++;
+          if (_qi < _qs.length) {
+            _lq();
+          } else {
+            _eg();
+          }
+        }, 1500);
+      }
+      
+      // End Game
+      function _eg() {
+        document.getElementById("game-play").classList.add("hidden");
+        document.getElementById("game-end").classList.remove("hidden");
+        document.getElementById("final-score").innerText = _sc;
+        _axp(_sc);
+      }
+      
+      // Restart Game
+      function _rg() {
+        _sg();
+      }
+      
+      // Add XP
+      function _axp(points) {
+        _xp += points;
+        document.getElementById("user-xp").innerText = _xp;
+        localStorage.setItem("CASPER_XP", _xp);
+      }
+      
+      // Initialize with scan tab
+      _st('scan');
     </script>
   </body>
 </html>
