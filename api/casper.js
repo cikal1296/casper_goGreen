@@ -1,3 +1,4 @@
+// api/casper.js - ES Modules Version
 export default async function handler(req, res) {
   // Only allow POST requests
   if (req.method !== "POST") {
