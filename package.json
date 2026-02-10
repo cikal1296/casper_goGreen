@@ -1,0 +1,12 @@
+{
+  "name": "casper-ai",
+  "version": "1.0.0",
+  "description": "CASPER AI - Asisten Kebersihan SMK Pertiwi",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}
